@@ -1,7 +1,11 @@
-FROM nginx:1.27-alpine
+FROM ubuntu
 
-COPY index.html styles.css script.js /usr/share/nginx/html/
+RUN apt-get update && \
+    apt-get install -y apache2 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY index.html style.css script.js /var/www/html/
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["apache2ctl", "-D", "FOREGROUND"]
