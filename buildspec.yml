@@ -3,14 +3,15 @@ version: 0.2
 env:
   variables:
     AWS_DEFAULT_REGION: eu-west-2
-    ECR_REPO_URI: 001520131116.dkr.ecr.eu-west-2.amazonaws.com
+    ECR_REGISTRY: 001520131116.dkr.ecr.eu-west-2.amazonaws.com
+    ECR_REPO_URI: 001520131116.dkr.ecr.eu-west-2.amazonaws.com/automatedimages
     CONTAINER_NAME: TandG
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URI
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
       - echo Getting Git commit hash...
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
