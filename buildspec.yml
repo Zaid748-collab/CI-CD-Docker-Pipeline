@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     AWS_DEFAULT_REGION: eu-west-2
-    ECR_REPO_URI: 001520131116.dkr.ecr.eu-west-2.amazonaws.com/automatedimages
+    ECR_REPO_URI: 001520131116.dkr.ecr.eu-west-2.amazonaws.com
     CONTAINER_NAME: TandG
 
 phases:
