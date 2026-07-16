@@ -1,0 +1,61 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing security scanning tools..."
+
+      # Install Semgrep for SAST scanning
+      - python3 -m pip install --upgrade pip
+      - python3 -m pip install semgrep
+
+      # Install Trivy for dependency and Dockerfile scanning
+      - |
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+          | sh -s -- -b /usr/local/bin
+
+      # Confirm that the tools were installed
+      - semgrep --version
+      - trivy --version
+
+  pre_build:
+    commands:
+      - echo "Starting source security scans..."
+
+  build:
+    commands:
+      # ----------------------------------------
+      # 1. SAST SCAN
+      # ----------------------------------------
+      - echo "Running Semgrep SAST scan..."
+      - semgrep scan --config auto --error .
+
+      # ----------------------------------------
+      # 2. DEPENDENCY VULNERABILITY SCAN
+      # ----------------------------------------
+      - echo "Running dependency vulnerability scan..."
+      - |
+        trivy fs \
+          --scanners vuln \
+          --severity CRITICAL \
+          --ignore-unfixed \
+          --exit-code 1 \
+          .
+
+      # ----------------------------------------
+      # 3. DOCKERFILE AND CONFIGURATION SCAN
+      # ----------------------------------------
+      - echo "Running Dockerfile and configuration scan..."
+      - |
+        trivy config \
+          --severity HIGH,CRITICAL \
+          --exit-code 1 \
+          .
+
+  post_build:
+    commands:
+      - echo "All source security scans passed successfully."
+
+artifacts:
+  files:
+    - "**/*"
